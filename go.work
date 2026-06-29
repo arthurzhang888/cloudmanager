@@ -1,6 +1,7 @@
-go 1.22
+go 1.25
 
 use (
     ./edge-agent
     ./cloud-backend
+    ./cloud-backend/api-gateway
 )

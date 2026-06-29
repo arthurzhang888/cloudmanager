@@ -6,6 +6,7 @@ import {
   Activity,
   CheckCircle,
   XCircle,
+  Droplets,
 } from 'lucide-react';
 import {
   LineChart,
@@ -17,8 +18,23 @@ import {
   ResponsiveContainer,
   AreaChart,
   Area,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
 } from 'recharts';
-import { mockDashboardStats, mockAlerts, generateMockPueHistory } from '../api/mock';
+import {
+  mockDashboardStats,
+  mockAlerts,
+  generateMockPueHistory,
+  generateMockTemperatureHistory,
+  generateMockAlertHistory,
+  generateMockServerUtilization,
+  generateMockCoolingEfficiency,
+  generateMockServerHealthDistribution,
+} from '../api/mock';
 import type { Alert } from '../types';
 
 function Dashboard() {
@@ -28,6 +44,11 @@ function Dashboard() {
   });
 
   const pueHistory = generateMockPueHistory(24);
+  const temperatureHistory = generateMockTemperatureHistory(24);
+  const alertHistory = generateMockAlertHistory(7);
+  const serverUtilization = generateMockServerUtilization(24);
+  const coolingEfficiency = generateMockCoolingEfficiency();
+  const serverHealthDistribution = generateMockServerHealthDistribution();
 
   const statCards = [
     {
@@ -177,6 +198,180 @@ function Dashboard() {
                   name="Cooling Power"
                 />
               </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+
+      {/* Temperature & Utilization Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Temperature Chart */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Thermometer className="text-red-500" size={20} />
+            <h3 className="text-lg font-semibold text-gray-800">Cooling Temperature (24h)</h3>
+          </div>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={temperatureHistory}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="time"
+                  tickFormatter={(time) => new Date(time).getHours() + ':00'}
+                />
+                <YAxis domain={[15, 35]} />
+                <Tooltip
+                  formatter={(value: number) => value.toFixed(1) + '°C'}
+                  labelFormatter={(label) => new Date(label).toLocaleString()}
+                />
+                <Legend />
+                <Line
+                  type="monotone"
+                  dataKey="supply_temp"
+                  stroke="#3b82f6"
+                  name="Supply Temp"
+                  strokeWidth={2}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="return_temp"
+                  stroke="#ef4444"
+                  name="Return Temp"
+                  strokeWidth={2}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="ambient_temp"
+                  stroke="#10b981"
+                  name="Ambient Temp"
+                  strokeWidth={2}
+                  strokeDasharray="5 5"
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Server Utilization Chart */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Activity className="text-blue-500" size={20} />
+            <h3 className="text-lg font-semibold text-gray-800">Server Utilization (24h)</h3>
+          </div>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={serverUtilization}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="time"
+                  tickFormatter={(time) => new Date(time).getHours() + ':00'}
+                />
+                <YAxis domain={[0, 100]} />
+                <Tooltip
+                  formatter={(value: number, name: string) => [
+                    value.toFixed(1) + (name === 'Power' ? ' kW' : '%'),
+                    name,
+                  ]}
+                  labelFormatter={(label) => new Date(label).toLocaleString()}
+                />
+                <Legend />
+                <Area
+                  type="monotone"
+                  dataKey="cpu_percent"
+                  stroke="#3b82f6"
+                  fill="#3b82f6"
+                  fillOpacity={0.2}
+                  name="CPU"
+                />
+                <Area
+                  type="monotone"
+                  dataKey="memory_percent"
+                  stroke="#8b5cf6"
+                  fill="#8b5cf6"
+                  fillOpacity={0.2}
+                  name="Memory"
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+
+      {/* Analytics Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Alert History */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <AlertCircle className="text-orange-500" size={20} />
+            <h3 className="text-lg font-semibold text-gray-800">Alert History (7d)</h3>
+          </div>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={alertHistory}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="time"
+                  tickFormatter={(time) =>
+                    new Date(time).toLocaleDateString('en-US', { weekday: 'short' })
+                  }
+                />
+                <YAxis />
+                <Tooltip
+                  labelFormatter={(label) => new Date(label).toLocaleDateString()}
+                />
+                <Legend />
+                <Bar dataKey="critical" fill="#ef4444" name="Critical" />
+                <Bar dataKey="warning" fill="#f59e0b" name="Warning" />
+                <Bar dataKey="info" fill="#3b82f6" name="Info" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Server Health Distribution */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Server className="text-green-500" size={20} />
+            <h3 className="text-lg font-semibold text-gray-800">Server Health</h3>
+          </div>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={serverHealthDistribution}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={80}
+                  paddingAngle={5}
+                  dataKey="value"
+                >
+                  {serverHealthDistribution.map((entry: { color: string }, index: number) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip formatter={(value: number) => value.toString() + ' servers'} />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Cooling Efficiency */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Droplets className="text-cyan-500" size={20} />
+            <h3 className="text-lg font-semibold text-gray-800">Cooling Efficiency</h3>
+          </div>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={coolingEfficiency} layout="vertical">
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis type="number" domain={[0, 100]} />
+                <YAxis type="category" dataKey="name" width={100} />
+                <Tooltip formatter={(value: number) => value.toFixed(1) + '%'} />
+                <Bar dataKey="value" fill="#06b6d4" radius={[0, 4, 4, 0]} />
+              </BarChart>
             </ResponsiveContainer>
           </div>
         </div>

@@ -287,3 +287,124 @@ export const generateMockPueHistory = (hours: number = 24): PueCalculation[] => 
 
   return history.reverse();
 };
+
+// Temperature history data point
+export interface TemperatureDataPoint {
+  time: string;
+  supply_temp: number;
+  return_temp: number;
+  ambient_temp: number;
+}
+
+// Generate mock temperature history
+export const generateMockTemperatureHistory = (hours: number = 24): TemperatureDataPoint[] => {
+  const history: TemperatureDataPoint[] = [];
+  const now = Date.now();
+  const interval = 60 * 60 * 1000; // 1 hour
+
+  for (let i = 0; i < hours; i++) {
+    const time = new Date(now - i * interval).toISOString();
+    history.push({
+      time,
+      supply_temp: parseFloat((20 + Math.random() * 3).toFixed(1)),
+      return_temp: parseFloat((26 + Math.random() * 4).toFixed(1)),
+      ambient_temp: parseFloat((22 + Math.random() * 5).toFixed(1)),
+    });
+  }
+
+  return history.reverse();
+};
+
+// Alert history data point
+export interface AlertHistoryDataPoint {
+  time: string;
+  critical: number;
+  warning: number;
+  info: number;
+}
+
+// Generate mock alert history
+export const generateMockAlertHistory = (days: number = 7): AlertHistoryDataPoint[] => {
+  const history: AlertHistoryDataPoint[] = [];
+  const now = Date.now();
+  const interval = 24 * 60 * 60 * 1000; // 1 day
+
+  for (let i = 0; i < days; i++) {
+    const time = new Date(now - i * interval).toISOString();
+    history.push({
+      time,
+      critical: Math.floor(Math.random() * 3),
+      warning: Math.floor(Math.random() * 8),
+      info: Math.floor(Math.random() * 15),
+    });
+  }
+
+  return history.reverse();
+};
+
+// Server utilization data point
+export interface ServerUtilizationDataPoint {
+  time: string;
+  cpu_percent: number;
+  memory_percent: number;
+  power_kw: number;
+}
+
+// Generate mock server utilization
+export const generateMockServerUtilization = (hours: number = 24): ServerUtilizationDataPoint[] => {
+  const history: ServerUtilizationDataPoint[] = [];
+  const now = Date.now();
+  const interval = 60 * 60 * 1000; // 1 hour
+
+  for (let i = 0; i < hours; i++) {
+    const time = new Date(now - i * interval).toISOString();
+    const cpuPercent = 30 + Math.random() * 50;
+    history.push({
+      time,
+      cpu_percent: parseFloat(cpuPercent.toFixed(1)),
+      memory_percent: parseFloat((40 + Math.random() * 40).toFixed(1)),
+      power_kw: parseFloat((0.3 + cpuPercent / 100 * 0.5).toFixed(2)),
+    });
+  }
+
+  return history.reverse();
+};
+
+// Cooling efficiency data
+export interface CoolingEfficiencyData {
+  name: string;
+  value: number;
+  unit: string;
+}
+
+// Generate mock cooling efficiency data
+export const generateMockCoolingEfficiency = (): CoolingEfficiencyData[] => {
+  return [
+    { name: 'CDU Efficiency', value: parseFloat((85 + Math.random() * 10).toFixed(1)), unit: '%' },
+    { name: 'Heat Recovery', value: parseFloat((60 + Math.random() * 20).toFixed(1)), unit: '%' },
+    { name: 'Flow Balance', value: parseFloat((90 + Math.random() * 8).toFixed(1)), unit: '%' },
+    { name: 'Setpoint Accuracy', value: parseFloat((95 + Math.random() * 4).toFixed(1)), unit: '%' },
+  ];
+};
+
+// Server health distribution
+export interface ServerHealthData {
+  name: string;
+  value: number;
+  color: string;
+}
+
+// Generate mock server health distribution
+export const generateMockServerHealthDistribution = (): ServerHealthData[] => {
+  const healthy = Math.floor(1189);
+  const warning = Math.floor(40);
+  const critical = Math.floor(18);
+  const offline = 58;
+
+  return [
+    { name: 'Healthy', value: healthy, color: '#22c55e' },
+    { name: 'Warning', value: warning, color: '#f59e0b' },
+    { name: 'Critical', value: critical, color: '#ef4444' },
+    { name: 'Offline', value: offline, color: '#6b7280' },
+  ];
+};

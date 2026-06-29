@@ -1,0 +1,31 @@
+package handlers
+
+import (
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+)
+
+// HealthHandler handles health check requests
+type HealthHandler struct{}
+
+// NewHealthHandler creates a new health handler
+func NewHealthHandler() *HealthHandler {
+	return &HealthHandler{}
+}
+
+// HealthCheck returns the health status of the API gateway
+func (h *HealthHandler) HealthCheck(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"status":    "healthy",
+		"service":   "api-gateway",
+		"version":   "0.1.0",
+	})
+}
+
+// ReadinessCheck checks if the gateway is ready to accept requests
+func (h *HealthHandler) ReadinessCheck(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"status": "ready",
+	})
+}

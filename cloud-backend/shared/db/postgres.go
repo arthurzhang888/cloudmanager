@@ -47,3 +47,31 @@ func (db *PostgresDB) Close() {
 func (db *PostgresDB) Health(ctx context.Context) error {
 	return db.Pool.Ping(ctx)
 }
+
+// Exec executes a query without returning rows
+func (db *PostgresDB) Exec(ctx context.Context, sql string, args ...interface{}) (interface{}, error) {
+	return db.Pool.Exec(ctx, sql, args...)
+}
+
+// Query executes a query that returns multiple rows
+func (db *PostgresDB) Query(ctx context.Context, sql string, args ...interface{}) (Rows, error) {
+	return db.Pool.Query(ctx, sql, args...)
+}
+
+// QueryRow executes a query that returns a single row
+func (db *PostgresDB) QueryRow(ctx context.Context, sql string, args ...interface{}) Row {
+	return db.Pool.QueryRow(ctx, sql, args...)
+}
+
+// Rows interface for database rows
+type Rows interface {
+	Next() bool
+	Scan(dest ...interface{}) error
+	Close()
+	Err() error
+}
+
+// Row interface for a single database row
+type Row interface {
+	Scan(dest ...interface{}) error
+}
