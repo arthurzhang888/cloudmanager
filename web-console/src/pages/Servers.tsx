@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Search, Filter, Server, Power, AlertTriangle } from 'lucide-react';
+import { Search, Filter, Power, AlertTriangle } from 'lucide-react';
 import { mockServers } from '../api/mock';
 import type { Server as ServerType } from '../types';
 
