@@ -1,0 +1,113 @@
+syntax = "proto3";
+
+package edge;
+option go_package = "github.com/cloudmanager/edge-agent/proto;edgepb";
+
+import "google/protobuf/timestamp.proto";
+
+service EdgeAgentService {
+  rpc Bootstrap(BootstrapRequest) returns (BootstrapResponse);
+  rpc Heartbeat(stream HeartbeatRequest) returns (stream HeartbeatResponse);
+  rpc ReportDiscovery(ReportDiscoveryRequest) returns (ReportDiscoveryResponse);
+  rpc ReportTelemetry(ReportTelemetryRequest) returns (ReportTelemetryResponse);
+}
+
+message BootstrapRequest {
+  string bootstrap_token = 1;
+  string hostname = 2;
+  string version = 3;
+  string public_key = 4;
+}
+
+message BootstrapResponse {
+  string agent_id = 1;
+  bytes certificate = 2;
+  bytes ca_certificate = 3;
+  AgentConfig config = 4;
+}
+
+message AgentConfig {
+  string dc_id = 1;
+  int64 heartbeat_interval_sec = 2;
+  DiscoveryConfig discovery = 3;
+  CollectionConfig collection = 4;
+}
+
+message DiscoveryConfig {
+  repeated string redfish_ip_ranges = 1;
+  repeated string snmp_ip_ranges = 2;
+  int64 scan_interval_sec = 3;
+}
+
+message CollectionConfig {
+  repeated CoolingDeviceConfig cooling_devices = 1;
+  int64 collection_interval_sec = 2;
+}
+
+message CoolingDeviceConfig {
+  string device_id = 1;
+  string name = 2;
+  string device_type = 3;
+  string modbus_address = 4;
+  int32 slave_id = 5;
+}
+
+message HeartbeatRequest {
+  string agent_id = 1;
+  google.protobuf.Timestamp timestamp = 2;
+  string status = 3;
+}
+
+message HeartbeatResponse {
+  google.protobuf.Timestamp timestamp = 1;
+  AgentConfig config_update = 2;
+}
+
+message ReportDiscoveryRequest {
+  string agent_id = 1;
+  google.protobuf.Timestamp timestamp = 2;
+  repeated ServerInfo servers = 3;
+  repeated CoolingDeviceInfo cooling_devices = 4;
+}
+
+message ReportDiscoveryResponse {
+  bool success = 1;
+}
+
+message ServerInfo {
+  string redfish_endpoint = 1;
+  string manufacturer = 2;
+  string model = 3;
+  string serial_number = 4;
+  int32 cpu_count = 5;
+  int64 memory_gb = 6;
+  string power_state = 7;
+  string health = 8;
+}
+
+message CoolingDeviceInfo {
+  string name = 1;
+  string device_type = 2;
+  string modbus_address = 3;
+  int32 slave_id = 4;
+}
+
+message ReportTelemetryRequest {
+  string agent_id = 1;
+  google.protobuf.Timestamp timestamp = 2;
+  repeated SensorReading readings = 3;
+}
+
+message ReportTelemetryResponse {
+  bool success = 1;
+  int32 accepted_count = 2;
+}
+
+message SensorReading {
+  string device_id = 1;
+  string device_type = 2;
+  google.protobuf.Timestamp timestamp = 3;
+  string metric_name = 4;
+  double value = 5;
+  string unit = 6;
+}
